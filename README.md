@@ -11,10 +11,11 @@
 ```objective-c
 ViewController * rootVC = [ViewController new];
 WHC_NavigationController * rootNV = [[WHC_NavigationController alloc] initWithRootViewController:rootVC];
+/// 该rootNV 队列下所有VC控制器都将自定义支持触摸手势返回Pop操作
 /// 其他操作........
 ```
 ### 使用效果
-![](![](https://github.com/netyouli/WHC_NavigationControllerKit/blob/master/show.gif))
+![](https://github.com/netyouli/WHC_NavigationControllerKit/blob/master/show.gif)
 
 
 
