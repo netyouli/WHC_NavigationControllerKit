@@ -11,7 +11,7 @@
  *  qq:712641411                                             *
  *  开发作者: 吴海超(WHC)                                      *
  *  iOS技术交流群:302157745                                    *
- *  gitHub:https://github.com/netyouli/WHC_BannerKit    *
+ *  gitHub:https://github.com/netyouli/WHC_NavigationControllerKit    *
  *                                                           *
  *************************************************************/
 
@@ -339,7 +339,7 @@
     }
 }
 
-- (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated{
+- (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
     UIViewController  * tabBarVC = self.topViewController;
     if([tabBarVC isKindOfClass:[UITabBarController class]]){
         ((UITabBarController*)tabBarVC).tabBar.translucent = NO;
@@ -382,7 +382,7 @@
     }
 }
 
-- (UIViewController *)popViewControllerAnimated:(BOOL)animated{
+- (UIViewController *)popViewControllerAnimated:(BOOL)animated {
     UIViewController  * viewController = nil;
     if(!_isTouchPop){
         __block UIView  * popView = self.topViewController.view;
