@@ -14,7 +14,7 @@ WHC_NavigationController * rootNV = [[WHC_NavigationController alloc] initWithRo
 /// 其他操作........
 ```
 ### 使用效果
-![](https://github.com/netyouli/WHC_BannerKit/blob/master/show.gif)
+![](https://github.com/netyouli/WHC_NavigationControllerKit/blob/master/show.gif)
 
 
 
