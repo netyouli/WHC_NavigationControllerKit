@@ -21,11 +21,12 @@
 #define KWHC_NAV_LEFT_PUSH_VIEW_TAG (KWHC_NAV_LEFT_VIEW_TAG + 1)
 #define KWHC_NAV_NAVBAR_TAG (KWHC_NAV_LEFT_VIEW_TAG + 2)
 #define KWHC_NAV_OVERVIEW_TAG (KWHC_NAV_LEFT_VIEW_TAG + 3)
-#define KWHC_NAV_ANIMATION_DURING (0.2)
+#define KWHC_NAV_ANIMATION_DURING (0.25)
 #define KWHC_NAV_POP_VIEW_CENTERX_OFFSET (0)
 #define KWHC_NAV_PUSH_VIEW_CENTERX_OFFSET (0)
-#define KWHC_NAV_POP_VIEW_ALPHA (1)
-#define KWHC_NAV_ALLOW_PULL_DISTANCE (30.0)
+#define KWHC_NAV_POP_VIEW_ALPHA (0.7)
+#define KWHC_NAV_ALLOW_PULL_DISTANCE (0)
+#define KWHC_NAV_VELOCITY_X (200)
 #define KWHC_NAV_Touch_Back_Rate (0.4)
 #define KWHC_NAV_Pop_Form_Border (-1)     //note > 0 from border pull < 0 any where pull diatancex > 30
 
@@ -91,10 +92,10 @@
 }
 
 #pragma mark - gestureMothed
-- (void)registPanGesture:(BOOL)b{
+- (void)registPanGesture:(BOOL)isRegist {
     self.delegate = self;
     self.interactivePopGestureRecognizer.enabled = NO;
-    if(b){
+    if(isRegist){
         if(_panGesture == nil){
             _panGesture = [[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(handlePanGesture:)];
             [_panGesture delaysTouchesBegan];
@@ -109,44 +110,49 @@
 }
 
 #pragma mark - handleGesture
-- (void)handlePanGesture:(UIPanGestureRecognizer*)panGesture{
+- (void)handlePanGesture:(UIPanGestureRecognizer*)panGesture {
     
     switch (panGesture.state) {
         case UIGestureRecognizerStateBegan:{
+            _willOpen = NO;
             _currentTx = self.view.transform.tx;
-            self.view.layer.shadowColor = [UIColor blackColor].CGColor;
-            self.view.layer.shadowOffset = CGSizeMake(3, 3);
+            self.view.layer.shadowColor = [UIColor colorWithWhite:0.5 alpha:0.8].CGColor;
+            self.view.layer.shadowOffset = CGSizeMake(-3, 3);
             self.view.layer.shadowOpacity = 1;
         }
             break;
         case UIGestureRecognizerStateChanged:{
-            CGFloat  moveDistance = [panGesture translationInView:panGesture.view].x;
-            if(!_willOpen){
-                if(KWHC_NAV_Pop_Form_Border < (0)){
-                    if(moveDistance < KWHC_NAV_ALLOW_PULL_DISTANCE){
-                        return;
+            CGPoint  velocity = [panGesture velocityInView:panGesture.view];
+            CGFloat  velocityX = velocity.x;
+            CGFloat  velocityY = -velocity.y;
+            if(KWHC_NAV_Pop_Form_Border < (0)){
+                if(!_willOpen && velocityX > KWHC_NAV_VELOCITY_X && velocityX > velocityY){
+                    [panGesture setTranslation:CGPointZero inView:panGesture.view];
+                    [self popView];
+                    if (_popView) {
+                        UIView * oldPopView = [self.view.superview viewWithTag:KWHC_NAV_LEFT_VIEW_TAG];
+                        if(oldPopView){
+                            [oldPopView removeFromSuperview];
+                        }
+                        [self.view.superview insertSubview:_popView belowSubview:self.view];
+                        _willOpen = YES;
                     }
-                }else{
-                    CGFloat touchX = [panGesture locationInView:panGesture.view].x;
-                    if(touchX > KWHC_NAV_Pop_Form_Border){
-                        return;
-                    }
+                }else if (!_willOpen) {
+                    return;
+                }
+            }else{
+                CGFloat touchX = [panGesture locationInView:panGesture.view].x;
+                if(touchX > KWHC_NAV_Pop_Form_Border){
+                    return;
                 }
             }
-            CGFloat  oriX = [panGesture velocityInView:panGesture.view].x;
+            
+            CGFloat  moveDistance = [panGesture translationInView:panGesture.view].x;
             CGFloat  rate = moveDistance / CGRectGetWidth(self.view.frame);
-            if(oriX > 0){//open door
-                [self popView];
-                if(!_willOpen && _popView != nil){
-                    
-                    UIView * oldPopView = [self.view.superview viewWithTag:KWHC_NAV_LEFT_VIEW_TAG];
-                    if(oldPopView){
-                        [oldPopView removeFromSuperview];
-                    }
-                    [self.view.superview insertSubview:_popView belowSubview:self.view];
-                    _willOpen = YES;
-                    
-                }
+
+            
+            if(velocityX > 0){//open door
+                
                 if(_willOpen && moveDistance >= 0.0){
                     
                     self.view.transform = [self initAffineTransform:moveDistance + _currentTx];
@@ -155,7 +161,7 @@
                     
                 }
                 
-            }else if(oriX < 0 && _willOpen && moveDistance >= 0.0){//close door
+            }else if(velocityX < 0 && _willOpen && moveDistance >= 0.0){//close door
                 
                 self.view.transform = [self initAffineTransform:moveDistance + _currentTx];
                 _popView.center = CGPointMake(KWHC_NAV_POP_VIEW_CENTERX_OFFSET + rate * CGRectGetWidth(_popView.frame) / 2.0, _popView.center.y);
@@ -176,7 +182,7 @@
             CGFloat velocity = [panGesture velocityInView:panGesture.view].x;
             if(_willOpen){
                 if(self.view.transform.tx / CGRectGetWidth(self.view.frame) < KWHC_NAV_Touch_Back_Rate) {
-                    if (velocity > 50) {
+                    if (velocity > KWHC_NAV_VELOCITY_X) {
                        [self closeLeftView:NO];
                     }else {
                         [self closeLeftView:YES];
@@ -211,7 +217,7 @@
     UIImage  * snapshootImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     
-    return [self cropImage:snapshootImage inRect:CGRectMake(0.0, 0.0, CGRectGetWidth(self.view.bounds), 64.0)];
+    return [self cropImage:snapshootImage inRect:CGRectMake(0.0, 0.0, CGRectGetWidth(self.view.bounds), 65.0)];
 }
 
 - (UIImage *)cropImage:(UIImage*)image inRect:(CGRect)rect{
@@ -268,6 +274,7 @@
         }
         _popView.center = CGPointMake(KWHC_NAV_POP_VIEW_CENTERX_OFFSET, _popView.center.y);
         _popView.alpha = KWHC_NAV_POP_VIEW_ALPHA;
+        _popView.userInteractionEnabled = NO;
         
     }else{
         
@@ -317,6 +324,7 @@
             [self resetLeftBorderShadowColor];
             [self registPanGesture:YES];
             _popView.alpha = 1.0;
+            _popView.userInteractionEnabled = YES;
             [self removeNavBarViewWithSuperView:_popView];
             
         }];
@@ -331,6 +339,7 @@
             [self resetLeftBorderShadowColor];
             [self registPanGesture:YES];
             _isTouchPop = YES;
+            _popView.userInteractionEnabled = YES;
             mainView.transform = [self initAffineTransform:0];
             [self removeNavBarViewWithSuperView:_popView];
             [self popViewControllerAnimated:NO];
