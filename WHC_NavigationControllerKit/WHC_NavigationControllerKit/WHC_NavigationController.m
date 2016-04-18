@@ -26,7 +26,7 @@
 #define KWHC_NAV_PUSH_VIEW_CENTERX_OFFSET (0)
 #define KWHC_NAV_POP_VIEW_ALPHA (0.7)
 #define KWHC_NAV_ALLOW_PULL_DISTANCE (0)
-#define KWHC_NAV_VELOCITY_X (200)
+#define KWHC_NAV_VELOCITY_X (500)
 #define KWHC_NAV_Touch_Back_Rate (0.4)
 #define KWHC_NAV_Pop_Form_Border (-1)     //note > 0 from border pull < 0 any where pull diatancex > 30
 
