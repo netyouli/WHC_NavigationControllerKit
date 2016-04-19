@@ -31,7 +31,7 @@
 #define KWHC_NAV_Pop_Form_Border (-1)     //note > 0 from border pull < 0 any where pull diatancex > 30
 
 #define MSN (wInterface) ((unsigned char *)&wInterface)[1]
-@interface WHC_NavigationController ()<UINavigationControllerDelegate>{
+@interface WHC_NavigationController ()<UINavigationControllerDelegate> {
     UIPanGestureRecognizer           *   _panGesture;
     CGFloat                              _currentTx;
     
@@ -51,33 +51,33 @@
 
 #pragma mark - initMothed
 
-- (instancetype)initWithRootViewController:(UIViewController *)rootViewController{
+- (instancetype)initWithRootViewController:(UIViewController *)rootViewController {
     self = [super initWithRootViewController:rootViewController];
-    if(self){
+    if(self) {
         [self registPanGesture:YES];
     }
     return self;
 }
 
-- (instancetype)initWithCoder:(NSCoder *)aDecoder{
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
-    if(self != nil){
+    if(self != nil) {
         [self registPanGesture:YES];
     }
     return self;
 }
 
-- (instancetype)init{
+- (instancetype)init {
     self = [super init];
-    if(self != nil){
+    if(self != nil) {
         [self registPanGesture:YES];
     }
     return self;
 }
 
-- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil{
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if(self){
+    if(self) {
         [self registPanGesture:YES];
     }
     return self;
@@ -95,14 +95,14 @@
 - (void)registPanGesture:(BOOL)isRegist {
     self.delegate = self;
     self.interactivePopGestureRecognizer.enabled = NO;
-    if(isRegist){
-        if(_panGesture == nil){
+    if(isRegist) {
+        if(_panGesture == nil) {
             _panGesture = [[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(handlePanGesture:)];
             [_panGesture delaysTouchesBegan];
             [self.view addGestureRecognizer:_panGesture];
         }
-    }else{
-        if(_panGesture != nil){
+    }else {
+        if(_panGesture != nil) {
             [self.view removeGestureRecognizer:_panGesture];
             _panGesture = nil;
         }
@@ -113,7 +113,7 @@
 - (void)handlePanGesture:(UIPanGestureRecognizer*)panGesture {
     
     switch (panGesture.state) {
-        case UIGestureRecognizerStateBegan:{
+        case UIGestureRecognizerStateBegan: {
             _willOpen = NO;
             _currentTx = self.view.transform.tx;
             self.view.layer.shadowColor = [UIColor colorWithWhite:0.5 alpha:0.8].CGColor;
@@ -121,17 +121,17 @@
             self.view.layer.shadowOpacity = 1;
         }
             break;
-        case UIGestureRecognizerStateChanged:{
+        case UIGestureRecognizerStateChanged: {
             CGPoint  velocity = [panGesture velocityInView:panGesture.view];
             CGFloat  velocityX = velocity.x;
             CGFloat  velocityY = MAX(-velocity.y, velocity.y);
-            if(KWHC_NAV_Pop_Form_Border < (0)){
-                if(!_willOpen && velocityX > KWHC_NAV_VELOCITY_X && velocityX > velocityY){
+            if(KWHC_NAV_Pop_Form_Border < (0)) {
+                if(!_willOpen && velocityX > KWHC_NAV_VELOCITY_X && velocityX > velocityY) {
                     [panGesture setTranslation:CGPointZero inView:panGesture.view];
                     [self popView];
                     if (_popView) {
                         UIView * oldPopView = [self.view.superview viewWithTag:KWHC_NAV_LEFT_VIEW_TAG];
-                        if(oldPopView){
+                        if(oldPopView) {
                             [oldPopView removeFromSuperview];
                         }
                         [self.view.superview insertSubview:_popView belowSubview:self.view];
@@ -140,9 +140,9 @@
                 }else if (!_willOpen) {
                     return;
                 }
-            }else{
+            }else {
                 CGFloat touchX = [panGesture locationInView:panGesture.view].x;
-                if(touchX > KWHC_NAV_Pop_Form_Border){
+                if(touchX > KWHC_NAV_Pop_Form_Border) {
                     return;
                 }
             }
@@ -151,9 +151,9 @@
             CGFloat  rate = moveDistance / CGRectGetWidth(self.view.frame);
 
             
-            if(velocityX > 0){//open door
+            if(velocityX > 0) {//open door
                 
-                if(_willOpen && moveDistance >= 0.0){
+                if(_willOpen && moveDistance >= 0.0) {
                     
                     self.view.transform = [self initAffineTransform:moveDistance + _currentTx];
                     _popView.center = CGPointMake(KWHC_NAV_POP_VIEW_CENTERX_OFFSET + rate * CGRectGetWidth(_popView.frame) / 2.0, _popView.center.y);
@@ -161,15 +161,15 @@
                     
                 }
                 
-            }else if(velocityX < 0 && _willOpen && moveDistance >= 0.0){//close door
+            }else if(velocityX < 0 && _willOpen && moveDistance >= 0.0) {//close door
                 
                 self.view.transform = [self initAffineTransform:moveDistance + _currentTx];
                 _popView.center = CGPointMake(KWHC_NAV_POP_VIEW_CENTERX_OFFSET + rate * CGRectGetWidth(_popView.frame) / 2.0, _popView.center.y);
                 _popView.alpha = KWHC_NAV_POP_VIEW_ALPHA * (rate + 1.0);
                 
-            }else if(_willOpen){
+            }else if(_willOpen) {
                 
-                if(moveDistance < 0.0 && self.view.transform.tx > 0){
+                if(moveDistance < 0.0 && self.view.transform.tx > 0) {
                     self.view.transform = [self initAffineTransform:0.0];
                     _popView.center = CGPointMake(KWHC_NAV_POP_VIEW_CENTERX_OFFSET, _popView.center.y);
                     _popView.alpha = KWHC_NAV_POP_VIEW_ALPHA;
@@ -178,19 +178,19 @@
         }
             break;
         case UIGestureRecognizerStateCancelled:
-        case UIGestureRecognizerStateEnded:{
+        case UIGestureRecognizerStateEnded: {
             CGFloat velocity = [panGesture velocityInView:panGesture.view].x;
-            if(_willOpen){
+            if(_willOpen) {
                 if(self.view.transform.tx / CGRectGetWidth(self.view.frame) < KWHC_NAV_Touch_Back_Rate) {
-                    if (velocity > KWHC_NAV_VELOCITY_X) {
+                    if (velocity > KWHC_NAV_VELOCITY_X)  {
                        [self closeLeftView:NO];
-                    }else {
+                    }else  {
                         [self closeLeftView:YES];
                     }
-                }else{
+                }else {
                     [self closeLeftView:NO];
                 }
-            }else {
+            }else  {
                 [self resetLeftBorderShadowColor];
             }
         }
@@ -206,11 +206,11 @@
     self.view.layer.shadowOpacity = 0;
 }
 
-- (CGAffineTransform)initAffineTransform:(CGFloat)x{
+- (CGAffineTransform)initAffineTransform:(CGFloat)x {
     return  CGAffineTransformMakeTranslation(x, 0.0);
 }
 
-- (UIImage*)snapshootNavBar:(UIViewController*)vc{
+- (UIImage*)snapshootNavBar:(UIViewController*)vc {
     
     UIGraphicsBeginImageContextWithOptions(self.view.frame.size, self.view.opaque, 0.0);
     [self.view.layer renderInContext:UIGraphicsGetCurrentContext()];
@@ -220,7 +220,7 @@
     return [self cropImage:snapshootImage inRect:CGRectMake(0.0, 0.0, CGRectGetWidth(self.view.bounds), 65.0)];
 }
 
-- (UIImage *)cropImage:(UIImage*)image inRect:(CGRect)rect{
+- (UIImage *)cropImage:(UIImage*)image inRect:(CGRect)rect {
     
     double (^rad)(double) = ^(double deg) {
         return deg / 180.0 * M_PI;
@@ -249,7 +249,7 @@
     return result;
 }
 
-- (UIImage*)imageFromImage:(UIImage*)image scaledToSize:(CGSize)newSize{
+- (UIImage*)imageFromImage:(UIImage*)image scaledToSize:(CGSize)newSize {
     
     UIGraphicsBeginImageContext( newSize );
     [image drawInRect:CGRectMake(0,0,newSize.width,newSize.height)];
@@ -259,8 +259,8 @@
     return newImage;
 }
 
-- (UIView*)popView{
-    if(_snapshootList != nil && _snapshootList.count > 1){
+- (UIView*)popView {
+    if(_snapshootList != nil && _snapshootList.count > 1) {
         
         UIImageView  * navBarView = [_snapshootList lastObject];
         navBarView.tag = KWHC_NAV_NAVBAR_TAG;
@@ -269,14 +269,14 @@
         UIViewController * vc = ((UIViewController*)self.viewControllers[self.viewControllers.count - 2]);
         _popView = vc.view;
         [_popView addSubview:navBarView];
-        if(!self.navigationBar.translucent){
+        if(!self.navigationBar.translucent) {
             navBarView.center = CGPointMake(CGRectGetWidth(navBarView.frame) / 2.0, -CGRectGetHeight(navBarView.frame) / 2.0);
         }
         _popView.center = CGPointMake(KWHC_NAV_POP_VIEW_CENTERX_OFFSET, _popView.center.y);
         _popView.alpha = KWHC_NAV_POP_VIEW_ALPHA;
         _popView.userInteractionEnabled = NO;
         
-    }else{
+    }else {
         
         _popView = nil;
         
@@ -284,21 +284,21 @@
     return _popView;
 }
 
-- (UIView*)pushView{
-    if(_snapshootList != nil && _snapshootList.count > 0){
+- (UIView*)pushView {
+    if(_snapshootList != nil && _snapshootList.count > 0) {
         
         UIImageView  * navBarView = [_snapshootList lastObject];
         navBarView.tag = KWHC_NAV_NAVBAR_TAG;
         navBarView.center = CGPointMake(CGRectGetWidth(navBarView.frame) / 2.0, CGRectGetHeight(navBarView.frame) / 2.0);
         _pushView = ((UIViewController*)self.viewControllers[self.viewControllers.count - 1]).view;
         [_pushView addSubview:navBarView];
-        if(!self.navigationBar.translucent){
+        if(!self.navigationBar.translucent) {
             navBarView.center = CGPointMake(CGRectGetWidth(navBarView.frame) / 2.0, -CGRectGetHeight(navBarView.frame) / 2.0);
         }
         _pushView.center = CGPointMake(KWHC_NAV_PUSH_VIEW_CENTERX_OFFSET, _pushView.center.y);
         _pushView.alpha = 1.0;
         
-    }else{
+    }else {
         
         _pushView = nil;
         
@@ -307,14 +307,14 @@
     return _pushView;
 }
 
-- (void)closeLeftView:(BOOL)isClose{
+- (void)closeLeftView:(BOOL)isClose {
     
     [self registPanGesture:NO];
     _willOpen = NO;
     UIView * mainView = self.view;
-    if(isClose){
+    if(isClose) {
         
-        [UIView animateWithDuration:KWHC_NAV_ANIMATION_DURING delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+        [UIView animateWithDuration:KWHC_NAV_ANIMATION_DURING delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^ {
             
             _popView.center = CGPointMake(KWHC_NAV_POP_VIEW_CENTERX_OFFSET, _popView.center.y);
             _popView.alpha = KWHC_NAV_POP_VIEW_ALPHA;
@@ -328,8 +328,8 @@
             [self removeNavBarViewWithSuperView:_popView];
             
         }];
-    }else{//pop opeartion
-        [UIView animateWithDuration:KWHC_NAV_ANIMATION_DURING delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+    }else {//pop opeartion
+        [UIView animateWithDuration:KWHC_NAV_ANIMATION_DURING delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^ {
             
             mainView.transform = [self initAffineTransform:CGRectGetWidth(mainView.frame)];
             _popView.center = CGPointMake(CGRectGetWidth(_popView.frame) / 2.0, _popView.center.y);
@@ -350,15 +350,15 @@
 
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
     UIViewController  * tabBarVC = self.topViewController;
-    if([tabBarVC isKindOfClass:[UITabBarController class]]){
+    if([tabBarVC isKindOfClass:[UITabBarController class]]) {
         ((UITabBarController*)tabBarVC).tabBar.translucent = NO;
     }
-    if(_snapshootList == nil){
+    if(_snapshootList == nil) {
         _snapshootList = [NSMutableArray array];
     }
     [_snapshootList addObject:[[UIImageView alloc]initWithImage:[self snapshootNavBar:viewController]]];
     
-    if(self.viewControllers.count > 0 && animated){
+    if(self.viewControllers.count > 0 && animated) {
         
         [self pushView];
         _topView = self.topViewController.view;
@@ -366,26 +366,26 @@
         [super pushViewController:viewController animated:NO];
         self.view.transform = [self initAffineTransform:CGRectGetWidth(self.view.frame)];
         UIView * oldPushView = [self.view.superview viewWithTag:KWHC_NAV_LEFT_PUSH_VIEW_TAG];
-        if(oldPushView){
+        if(oldPushView) {
             [oldPushView removeFromSuperview];
             oldPushView = nil;
         }
         _pushView.center = CGPointMake(CGRectGetWidth(_pushView.frame) / 2.0, _pushView.center.y);
         [self.view.superview insertSubview:_pushView belowSubview:self.view];
-        [UIView animateWithDuration:KWHC_NAV_ANIMATION_DURING delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        [UIView animateWithDuration:KWHC_NAV_ANIMATION_DURING delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^ {
             _pushView.center = CGPointMake(-CGRectGetWidth(_pushView.frame) / 2.0, _pushView.center.y);
             _pushView.alpha = KWHC_NAV_POP_VIEW_ALPHA;
             self.view.transform = [self initAffineTransform:0];
         } completion:^(BOOL finished) {
             _pushView.alpha = 1.0;
             [self removeNavBarViewWithSuperView:_pushView];
-            if([tabBarVC isKindOfClass:[UITabBarController class]]){
+            if([tabBarVC isKindOfClass:[UITabBarController class]]) {
                 ((UITabBarController *)tabBarVC).tabBar.translucent = YES;
             }
         }];
-    }else{
+    }else {
         [super pushViewController:viewController animated:animated];
-        if([tabBarVC isKindOfClass:[UITabBarController class]]){
+        if([tabBarVC isKindOfClass:[UITabBarController class]]) {
             ((UITabBarController *)tabBarVC).tabBar.translucent = YES;
         }
     }
@@ -393,27 +393,27 @@
 
 - (UIViewController *)popViewControllerAnimated:(BOOL)animated {
     UIViewController  * viewController = nil;
-    if(!_isTouchPop){
+    if(!_isTouchPop) {
         __block UIView  * popView = self.topViewController.view;
         UIImageView * navBarView = [[UIImageView alloc]initWithImage:[self snapshootNavBar:nil]];
         navBarView.tag = KWHC_NAV_NAVBAR_TAG;
         navBarView.center = CGPointMake(CGRectGetWidth(navBarView.frame) / 2.0, CGRectGetHeight(navBarView.frame) / 2.0);
-        if(!self.navigationBar.translucent){
+        if(!self.navigationBar.translucent) {
             navBarView.center = CGPointMake(CGRectGetWidth(navBarView.frame) / 2.0, -CGRectGetHeight(navBarView.frame) / 2.0);
         }
         [popView addSubview:navBarView];
         viewController = [super popViewControllerAnimated:NO];
-        if(popView){
+        if(popView) {
             self.view.transform = [self initAffineTransform:-CGRectGetWidth(self.view.frame)];
             self.view.alpha = KWHC_NAV_POP_VIEW_ALPHA;
             UIView  * oldPopView = [self.view.superview viewWithTag:KWHC_NAV_LEFT_VIEW_TAG];
-            if(oldPopView){
+            if(oldPopView) {
                 [oldPopView removeFromSuperview];
                 oldPopView = nil;
             }
             popView.center = CGPointMake(CGRectGetWidth(popView.frame) / 2.0, popView.center.y);
             [self.view.superview insertSubview:popView belowSubview:self.view];
-            [UIView animateWithDuration:KWHC_NAV_ANIMATION_DURING delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+            [UIView animateWithDuration:KWHC_NAV_ANIMATION_DURING delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^ {
                 popView.center = CGPointMake(CGRectGetWidth(popView.frame) * 1.5, popView.center.y);
                 self.view.transform = [self initAffineTransform:0];
                 self.view.alpha = 1.0;
@@ -423,7 +423,7 @@
                 [_snapshootList removeLastObject];
             }];
         }
-    }else{
+    }else {
         [_snapshootList removeLastObject];
         viewController = [super popViewControllerAnimated:animated];
     }
@@ -431,10 +431,10 @@
     return viewController;
 }
 
-- (void)removeNavBarViewWithSuperView:(UIView*)superView{
+- (void)removeNavBarViewWithSuperView:(UIView*)superView {
     
     UIView  *  navBarView = [superView viewWithTag:KWHC_NAV_NAVBAR_TAG];
-    if(navBarView){
+    if(navBarView) {
         
         [navBarView removeFromSuperview];
         navBarView = nil;
@@ -453,11 +453,11 @@
 
 
 #pragma mark - UINavigationControllerDelegate
-- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated {
 }
 
-- (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
-    if(_topView != nil){
+- (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated {
+    if(_topView != nil) {
         _topView.userInteractionEnabled = YES;
     }
 }
