@@ -124,7 +124,7 @@
         case UIGestureRecognizerStateChanged:{
             CGPoint  velocity = [panGesture velocityInView:panGesture.view];
             CGFloat  velocityX = velocity.x;
-            CGFloat  velocityY = -velocity.y;
+            CGFloat  velocityY = MAX(-velocity.y, velocity.y);
             if(KWHC_NAV_Pop_Form_Border < (0)){
                 if(!_willOpen && velocityX > KWHC_NAV_VELOCITY_X && velocityX > velocityY){
                     [panGesture setTranslation:CGPointZero inView:panGesture.view];
